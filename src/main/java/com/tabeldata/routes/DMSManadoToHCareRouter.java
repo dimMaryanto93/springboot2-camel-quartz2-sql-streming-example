@@ -21,7 +21,6 @@ public class DMSManadoToHCareRouter extends RouteBuilder {
                     .split(body()).streaming()// TODO stream()
                         .log(LoggingLevel.INFO, "${body}")
                         .to("sql:classpath://camel/query/manado/write-customer.sql?dataSource=#hcare&transacted=true&batch=true")//TODO write data with stream
-                        .log(LoggingLevel.INFO, "${body}")
                     .end();
 
     }
