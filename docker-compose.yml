@@ -1,0 +1,49 @@
+version: '3.7'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=PasswordnyaSA2018
+      - MSSQL_PID=Developer
+    ports:
+      - 1433:1433
+    volumes:
+      - sqlserver_data:/var/opt/mssql/
+    networks:
+      - postgres-network
+  flyway-sqlserver:
+    image: tabeldata.ip-dynamic.com:8088/flyway/flyway:6.0.8
+    command: -url=jdbc:sqlserver://sqlserver:1433;databaseName=master -schemas=dbo -user=sa -password=PasswordnyaSA2018 -connectRetries=60 migrate
+    volumes:
+      - ./migration/sqlserver:/flyway/sql
+    depends_on:
+      - sqlserver
+    networks:
+      - postgres-network
+  postgres:
+    image: tabeldata.ip-dynamic.com:8088/postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=passwordnyaPostgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+  flyway-postgresql:
+    image: tabeldata.ip-dynamic.com:8088/flyway/flyway:6.0.8
+    command: -url=jdbc:postgresql://postgres:5432/postgres -schemas=public -user=postgres -password=passwordnyaPostgres -connectRetries=60 migrate
+    volumes:
+      - ./migration/postgresql:/flyway/sql
+    depends_on:
+      - postgres
+    networks:
+      - postgres-network
+networks:
+  postgres-network:
+volumes:
+  sqlserver_data:
+  postgres_data:

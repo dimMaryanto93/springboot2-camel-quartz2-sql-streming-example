@@ -1,0 +1,46 @@
+server:
+  port: ${APPLICATION_PORT:9090}
+  servlet:
+    context-path: /@project.artifactId@
+# spring configuration
+spring:
+  application:
+    name: @project.artifactId@
+    version: @project.version@
+    fullname: @project.name@
+  mvc:
+    dispatch-options-request: true
+hcare:
+  datasource:
+    url: jdbc:sqlserver://${DB1_DATABASE_HOST:localhost}:${DB1_DATABASE_PORT:1433};databaseName=${DB1_DATABASE_NAME:master}
+    username: ${DB1_DATABASE_USERNAME:sa}
+    password: ${DB1_DATABASE_PASSWORD:PasswordnyaSA2018}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+dmz-manado:
+  datasource:
+    url: jdbc:postgresql://${DB2_DATABASE_HOST:localhost}:${DB2_DATABASE_PORT:5432}/${DB2_DATABASE_NAME:postgres}
+    username: ${DB2_DATABASE_USERNAME:postgres}
+    password: ${DB2_DATABASE_PASSWORD:passwordnyaPostgres}
+    driver-class-name: org.postgresql.Driver
+logging:
+  level:
+    org.springframework: ERROR
+    com.tabeldata: ${LOG_LEVEL:DEBUG}
+  file: ${LOG_LOCATION:${spring.application.name}.log}
+camel:
+  component:
+    sql:
+      enabled: true
+      use-placeholder: true
+      resolve-property-placeholders: true
+    file:
+      enabled: true
+  dataformat:
+    csv:
+      directory: ${DIRECTORY_OUPUT_CSV:target}
+      delimiter: ';'
+      enabled: true
+      allow-missing-column-names: false
+      escape-disabled: false
+      trim: false
+      quote: "\""
