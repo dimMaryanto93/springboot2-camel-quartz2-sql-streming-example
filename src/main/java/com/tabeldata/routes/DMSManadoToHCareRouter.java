@@ -18,10 +18,10 @@ public class DMSManadoToHCareRouter extends RouteBuilder {
                 .routeGroup("dmz-manado")
                 .routeId("migrate-to-hcare")
                     .to("sql:classpath://camel/query/manado/read-customer.sql?dataSource=#dmzManado&outputType=StreamList")// TODO read data return as List
-                    .log(LoggingLevel.ERROR, "${exception.message}")
                     .split(body()).streaming()// TODO stream()
                         .log(LoggingLevel.INFO, "${body}")
-                        .to("sql:classpath://camel/query/manado/write-customer.sql?dataSource=#hcare")//TODO write data with stream
+                        .to("sql:classpath://camel/query/manado/write-customer.sql?dataSource=#hcare&transacted=true&batch=true")//TODO write data with stream
+                        .log(LoggingLevel.INFO, "${body}")
                     .end();
 
     }
