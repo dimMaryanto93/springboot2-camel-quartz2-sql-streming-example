@@ -21,22 +21,29 @@ services:
       - sqlserver
     networks:
       - postgres-network
-  db2:
-    image: tabeldata.ip-dynamic.com:8088/ibmcom/db2
+  postgres:
+    image: tabeldata.ip-dynamic.com:8088/postgres:9.6
     environment:
-      - DBNAME=testdb
-      - DB2INST1_PASSWORD=infinit
-      - ARCHIVE_LOGS=false
-      - LICENSE=accept
+      - POSTGRES_PASSWORD=passwordnyaPostgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
     ports:
-      - 50000:50000
+      - 5432:5432
     volumes:
-      - db2_data:/database
-    privileged: true
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+  flyway-postgres:
+    image: tabeldata.ip-dynamic.com:8088/flyway/flyway:6.0.8
+    command: -url=jdbc:postgresql://postgres:5432/postgres -user=postgres -password=passwordnyaPostgres -connectRetries=60 migrate
+    volumes:
+      - ./migration/postgresql:/flyway/sql
+    depends_on:
+      - postgres
     networks:
       - postgres-network
 networks:
   postgres-network:
 volumes:
   sqlserver_data:
-  db2_data:
+  postgres_data:

@@ -17,11 +17,10 @@ public class DMSManadoToHCareRouter extends RouteBuilder {
         from("quartz2://manado/timerName?cron=0+0/1+*+1/1+*+?+*") // TODO run every minutes at ?:?:00
                 .routeGroup("dmz-manado")
                 .routeId("migrate-to-hcare")
-                    .to("sql:classpath://camel/query/manado/read-customer.sql?dataSource=#dmzManado&outputType=StreamList")// TODO read data return as List
+                    .to("sql:classpath:camel/query/manado/read-customer.sql?dataSource=#dmzManado&outputType=StreamList")// TODO read data return as List
                     .split(body()).streaming()// TODO stream()
                         .log(LoggingLevel.INFO, "${body}")
-                        .to("sql:classpath://camel/query/manado/write-customer.sql?dataSource=#hcare&transacted=true&batch=true")//TODO write data with stream
-                    .end();
-
+                        .to("sql:classpath:camel/query/manado/writer-customer-merge.sql?dataSource=#hcare&transacted=true&batch=true")
+                .end();
     }
 }
